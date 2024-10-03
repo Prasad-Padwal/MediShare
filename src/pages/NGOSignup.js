@@ -4,11 +4,13 @@ import { auth, db } from '../firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 
-const NGOSignup = () => {
+function NGOSignup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [registrationNumber, setRegistrationNumber] = useState('');
+  const [ngoName, setNgoName] = useState('');
+  const [ngoId, setNgoId] = useState('');
+  const [address, setAddress] = useState('');
+  const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -16,69 +18,82 @@ const NGOSignup = () => {
     e.preventDefault();
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      await setDoc(doc(db, 'users', userCredential.user.uid), {
-        name,
+      const user = userCredential.user;
+      
+      await setDoc(doc(db, "ngos", user.uid), {
+        ngoName,
+        ngoId,
         email,
-        registrationNumber,
+        address,
+        phone,
         role: 'ngo'
       });
-      navigate('/ngo-dashboard');
+
+      navigate('/ngo/dashboard');
     } catch (error) {
       setError(error.message);
     }
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10">
-      <h2 className="text-2xl font-bold mb-5">NGO Sign Up</h2>
-      {error && <p className="text-red-500 mb-5">{error}</p>}
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block mb-1">NGO Name</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            className="w-full px-3 py-2 border rounded"
-          />
-        </div>
-        <div>
-          <label className="block mb-1">Registration Number</label>
-          <input
-            type="text"
-            value={registrationNumber}
-            onChange={(e) => setRegistrationNumber(e.target.value)}
-            required
-            className="w-full px-3 py-2 border rounded"
-          />
-        </div>
-        <div>
-          <label className="block mb-1">Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full px-3 py-2 border rounded"
-          />
-        </div>
-        <div>
-          <label className="block mb-1">Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full px-3 py-2 border rounded"
-          />
-        </div>
-        <button type="submit" className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600">
-          Sign Up as NGO
+    <div className="container mx-auto mt-10 max-w-md px-4">
+      <h1 className="text-3xl font-bold mb-6 text-center text-emerald-600">NGO Sign Up</h1>
+      {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
+      <form onSubmit={handleSubmit} className="space-y-4 bg-white p-8 rounded-lg shadow-lg animate-fade-in">
+        <input
+          type="text"
+          placeholder="NGO Name"
+          value={ngoName}
+          onChange={(e) => setNgoName(e.target.value)}
+          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          required
+        />
+        <input
+          type="text"
+          placeholder="NGO ID"
+          value={ngoId}
+          onChange={(e) => setNgoId(e.target.value)}
+          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          required
+        />
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          required
+        />
+        <input
+          type="text"
+          placeholder="Address"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          required
+        />
+        <input
+          type="tel"
+          placeholder="Phone Number"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          required
+        />
+        <button type="submit" className="w-full bg-emerald-500 text-white p-3 rounded-lg hover:bg-emerald-600 transition duration-300 shadow-md">
+          Sign Up
         </button>
       </form>
     </div>
   );
-};
+}
 
 export default NGOSignup;

@@ -1,45 +1,38 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../Contexts/AuthContext";
+import React, { useContext } from 'react';
+import { Link } from 'react-router-dom';
+import { AuthContext } from '../Contexts/AuthContext';
+import { auth } from '../firebase';
 
-const Navbar = () => {
-  const navigate = useNavigate();
-  const { currentUser, logout } = useAuth();
+function Navbar() {
+  const { currentUser } = useContext(AuthContext);
 
-  const handleClick = async () => {
-    try {
-      await logout();
-      localStorage.clear();
-      navigate('/login');
-    } catch (error) {
-      console.error("Failed to log out", error);
-    }
+  const handleLogout = () => {
+    auth.signOut();
   };
 
   return (
-    <div className="py-2 px-16 flex items-center bg-primary-gray justify-between border-2 border-b-primary-gray">
-      <div className="flex items-center">
-        <img className="w-[50px]" alt="Logo" /> {/* Add your logo source */}
-        <a href='/' className="font-bold text-2xl text-[#3A8EF6] ml-4">
+    <nav className="bg-blue-600 p-4 shadow-md">
+      <div className="container mx-auto flex justify-between items-center">
+        <Link to="/" className="text-white font-bold text-2xl flex items-center">
+          <img src="/logo.png" alt="CareSwap Logo" className="h-8 w-8 mr-2" />
           CareSwap
-        </a>
+        </Link>
+        <div className="space-x-4">
+          {currentUser ? (
+            <>
+              <Link to="/donate" className="text-white hover:text-amber-300 transition duration-300">Donate</Link>
+              <button onClick={handleLogout} className="text-white hover:text-amber-300 transition duration-300">Logout</button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="text-white hover:text-amber-300 transition duration-300">Login</Link>
+              <Link to="/signup" className="bg-emerald-500 text-white px-4 py-2 rounded-full hover:bg-emerald-600 transition duration-300">Sign Up</Link>
+            </>
+          )}
+        </div>
       </div>
-      <div className="flex items-center justify-center">
-        {currentUser ? (
-          <>
-            <div className="pr-3">{currentUser.email}</div>
-            <button className="btn-primary mb-0" onClick={handleClick} style={{marginBottom: "0px"}}>
-              Logout
-            </button>
-          </>
-        ) : (
-          <button className="btn-primary mb-0" onClick={() => navigate('/login')} style={{marginBottom: "0px"}}>
-            Login
-          </button>
-        )}
-      </div>
-    </div>
+    </nav>
   );
-};
+}
 
 export default Navbar;

@@ -1,58 +1,52 @@
-import React, { useState, useEffect } from "react";
-import { db } from "../firebase";
-import { collection, query, where, getDocs, updateDoc, doc } from "firebase/firestore";
+import React, { useState, useEffect, useContext } from 'react';
+import { getNotifications } from '../services/apiService';
+import NotificationCard from '../components/NotificationCard';
+import { AuthContext } from '../Contexts/AuthContext';
 
-export default function NGODashboard() {
-  const [donations, setDonations] = useState([]);
+function NGODashboard() {
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { currentUser } = useContext(AuthContext);
 
   useEffect(() => {
-    const fetchDonations = async () => {
-      const q = query(collection(db, "donations"), where("status", "==", "pending"));
-      const querySnapshot = await getDocs(q);
-      setDonations(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    const fetchNotifications = async () => {
+      if (!currentUser || !currentUser.uid) {
+        setError("User not authenticated");
+        setLoading(false);
+        return;
+      }
+      try {
+        const data = await getNotifications(currentUser.uid);
+        setNotifications(data);
+      } catch (err) {
+        console.error('Failed to fetch notifications:', err);
+        setError(`Failed to load notifications. Error: ${err.message}`);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    fetchDonations();
-  }, []);
+    fetchNotifications();
+  }, [currentUser]);
 
-  const handleAccept = async (id) => {
-    await updateDoc(doc(db, "donations", id), { status: "accepted" });
-    setDonations(donations.filter(donation => donation.id !== id));
-  };
-
-  const handleReject = async (id) => {
-    await updateDoc(doc(db, "donations", id), { status: "rejected" });
-    setDonations(donations.filter(donation => donation.id !== id));
-  };
+  if (loading) return <div className="text-center mt-10">Loading...</div>;
+  if (error) return <div className="text-center mt-10 text-red-500">{error}</div>;
 
   return (
-    <div className="container mx-auto px-4">
-      <h1 className="text-2xl font-bold mb-4">NGO Dashboard</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {donations.map((donation) => (
-          <div key={donation.id} className="bg-white shadow-md rounded-lg p-4">
-            <h2 className="text-xl font-semibold">{donation.name}</h2>
-            <p>Quantity: {donation.quantity}</p>
-            <p>Expiry Date: {donation.expiryDate}</p>
-            <p>Donor: {donation.donorName}</p>
-            {donation.imageUrl && <img src={donation.imageUrl} alt={donation.name} className="mt-2 w-full h-40 object-cover rounded" />}
-            <div className="mt-4 flex justify-between">
-              <button
-                onClick={() => handleAccept(donation.id)}
-                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-              >
-                Accept
-              </button>
-              <button
-                onClick={() => handleReject(donation.id)}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-              >
-                Reject
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+    <div className="container mx-auto mt-10 px-4">
+      <h1 className="text-2xl font-bold mb-5">NGO Dashboard</h1>
+      {notifications.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {notifications.map(notification => (
+            <NotificationCard key={notification.id} notification={notification} />
+          ))}
+        </div>
+      ) : (
+        <p className="text-center text-gray-600">No pending donations available. (Total: {notifications.length})</p>
+      )}
     </div>
   );
 }
+
+export default NGODashboard;
