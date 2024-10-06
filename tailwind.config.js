@@ -4,21 +4,20 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'primary-dark': '#9356FB',
-        'primary-light': '#D772EA',
-        'primary-black': "#171717",
-        'primary-gray': "#EEEEEE",
-      },
-      fontFamily: {
-        ourfont: ["Poppins", "serif"], 
-      },
-      boxShadow: {
-        "main-sd": "1px 1px 7px 2px rgba(0, 0, 0, 0.25)",
-        "primary-sd": "1px 1px 20px rgba(0, 0, 0, 0.2)",
-        "secondary-sd": "0 5px 15px rgb(0, 0, 0, 0.07)",
-      },
-      container: {
-        center: true,
+        purple: {
+          100: '#F3E8FF',
+          500: '#8B5CF6',
+          600: '#7C3AED',
+          700: '#6D28D9',
+        },
+        pink: {
+          100: '#FCE7F3',
+          500: '#EC4899',
+          600: '#DB2777',
+        },
+        blue: {
+          100: '#E0F2FE',
+        },
       },
     },
   },

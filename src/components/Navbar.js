@@ -1,34 +1,40 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { AuthContext } from '../Contexts/AuthContext';
-import { auth } from '../firebase';
+import { FaMedkit } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
 function Navbar() {
-  const { currentUser } = useContext(AuthContext);
-
-  const handleLogout = () => {
-    auth.signOut();
-  };
-
   return (
-    <nav className="bg-blue-600 p-4 shadow-md">
+    <nav className="bg-gradient-to-r from-indigo-500 to-purple-600 p-4 shadow-md">
       <div className="container mx-auto flex justify-between items-center">
-        <Link to="/" className="text-white font-bold text-2xl flex items-center">
-          <img src="/logo.png" alt="CareSwap Logo" className="h-8 w-8 mr-2" />
-          CareSwap
+        <Link to="/" className="flex items-center space-x-2">
+          <motion.div
+            whileHover={{ rotate: 360 }}
+            transition={{ duration: 0.5 }}
+          >
+            <FaMedkit className="text-3xl text-white" />
+          </motion.div>
+          <span className="text-white font-bold text-2xl">MediShare</span>
         </Link>
         <div className="space-x-4">
-          {currentUser ? (
-            <>
-              <Link to="/donate" className="text-white hover:text-amber-300 transition duration-300">Donate</Link>
-              <button onClick={handleLogout} className="text-white hover:text-amber-300 transition duration-300">Logout</button>
-            </>
-          ) : (
-            <>
-              <Link to="/login" className="text-white hover:text-amber-300 transition duration-300">Login</Link>
-              <Link to="/signup" className="bg-emerald-500 text-white px-4 py-2 rounded-full hover:bg-emerald-600 transition duration-300">Sign Up</Link>
-            </>
-          )}
+          <Link to="/login">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="text-white hover:text-indigo-200 transition duration-300"
+            >
+              Login
+            </motion.button>
+          </Link>
+          <Link to="/signup">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-teal-400 hover:bg-teal-500 text-white px-4 py-2 rounded-full transition duration-300 shadow-md"
+            >
+              Sign Up
+            </motion.button>
+          </Link>
         </div>
       </div>
     </nav>
